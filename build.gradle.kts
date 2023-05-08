@@ -6,7 +6,7 @@ group = "ru.vsu.cs.ereshkin_a_v"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    jcenter()
+    //jcenter()
     mavenCentral()
 }
 

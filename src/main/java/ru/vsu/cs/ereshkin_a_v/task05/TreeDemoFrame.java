@@ -31,7 +31,7 @@ public class TreeDemoFrame extends JFrame {
 	private final JPanel paintPanel;
 	private final JFileChooser fileChooserSave;
 
-	FileTree tree = new FileTree("./rootDirectory");
+	FileTree tree = new FileTree(".");
 
 
 	public TreeDemoFrame() {
@@ -58,6 +58,8 @@ public class TreeDemoFrame extends JFrame {
 			}
 		};
 		JScrollPane paintJScrollPane = new JScrollPane(paintPanel);
+		paintJScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		paintJScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panelPaintArea.add(paintJScrollPane);
 
 		fileChooserSave = new JFileChooser();
