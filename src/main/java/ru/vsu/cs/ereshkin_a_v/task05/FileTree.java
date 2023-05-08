@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Function;
 
-public class FileTree implements Iterable<File> {
+public class FileTree {
 
 	protected FileTreeNode root = null;
 	protected Function<File, String> toStrFunc;
@@ -15,11 +15,11 @@ public class FileTree implements Iterable<File> {
 	public FileTree(Function<File, String> toStrFunc) {
 		this.toStrFunc = toStrFunc;
 	}
-
+	@SuppressWarnings("unused")
 	public FileTree() {
 		this(Object::toString);
 	}
-
+	@SuppressWarnings("unused")
 	public FileTree(File rootDirectory) {
 		this(Object::toString);
 		setRoot(rootDirectory);
@@ -30,34 +30,8 @@ public class FileTree implements Iterable<File> {
 		setRoot(new File(rootDirectoryPath));
 	}
 
-	private static void expand(File file, FileFilter fileFilter,
-	                   Queue<File> outFiles, Queue<File> outDirs) {
-		if (file == null) return;
-		File[] list = file.listFiles();
-		if (list == null) return;
-		for (File child : list) {
-			if (child == null) continue;
-			boolean isDir = child.isDirectory();
-			if (isDir) {
-				outDirs.offer(child);
-			}
-
-			if (fileFilter == null || fileFilter.accept(child)) {
-				outFiles.offer(child);
-			}
-		}
-	}
-
-	private static boolean isDirectory(File file) {
-		return file != null && file.exists() && file.isDirectory();
-	}
-
 	public FileTreeNode getRoot() {
 		return root;
-	}
-
-	public File getRootFile() {
-		return root.getValue();
 	}
 
 	public void setRoot(File value) {
@@ -67,12 +41,6 @@ public class FileTree implements Iterable<File> {
 
 	public void clear() {
 		root = null;
-	}
-
-	private void skipSpaces(String bracketStr, IndexWrapper iw) {
-		while (iw.index < bracketStr.length() && Character.isWhitespace(bracketStr.charAt(iw.index))) {
-			iw.index++;
-		}
 	}
 
 	public String toBracketNotation() throws Exception {
@@ -95,9 +63,7 @@ public class FileTree implements Iterable<File> {
 		str.append('(');
 		/// Поддиректории
 		for (int i = 0; i < parentNode.numberOfChildrenNodes() - 1; i++) {
-			//str.append('\"');
 			str.append(toBracketNotation(parentNode.getChildNode(i)));
-			//str.append('\"');
 			str.append(",");
 		}
 		str.append('\"');
@@ -119,60 +85,10 @@ public class FileTree implements Iterable<File> {
 		return str.toString();
 	}
 
-	@Override
-	public Iterator<File> iterator() {
-		return new FileTreeIterator(this.root.getValue(), null);
-	}
-
 	public List<File> searchByNameAndExtension(String fileFullName) {
 		List<File> resultList = new ArrayList<>();
-		/*for (File file : this) {
-			if (file.getName().equals(fileFullName)) System.out.println(file.getName());
-		}*/
+
 		return resultList;
-	}
-
-	private static class FileTreeIterator implements Iterator<File> {
-		private final Queue<File> dirs = new LinkedList<>();
-		private final Queue<File> files = new LinkedList<>();
-		private final FileFilter fileFilter;
-
-		private FileTreeIterator(File root, FileFilter fileFilter) {
-			if (isDirectory(root)) {
-				this.dirs.add(root);
-			}
-			this.fileFilter = fileFilter;
-		}
-
-		public boolean hasNext() {
-			if (this.files.peek() == null)
-				expandUntilFilesFound();
-			return this.files.peek() != null;
-		}
-
-		public File next() {
-			if (this.files.peek() == null) {
-				expandUntilFilesFound();
-				if (this.files.peek() == null)
-					throw new NoSuchElementException();
-			}
-			return this.files.poll();
-		}
-
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-		private void expandUntilFilesFound() {
-			while (this.dirs.peek() != null && this.files.peek() == null)
-				expand(this.dirs.poll());
-		}
-
-		private void expand(File directory) {
-			if (directory != null) {
-				FileTree.expand(directory, this.fileFilter, this.files, this.dirs);
-			}
-		}
 	}
 
 	public static class FileTreeNode {
@@ -188,13 +104,6 @@ public class FileTree implements Iterable<File> {
 		 * Листья, они же обычные файлы
 		 */
 		private final List<File> childValues;
-		private final Color color = Color.ORANGE;
-
-		public FileTreeNode(File value, List<FileTreeNode> childNodes) {
-			this.value = value;
-			this.childNodes = childNodes;
-			this.childValues = new ArrayList<>();
-		}
 
 		public FileTreeNode(File value) {
 			this.value = value;
@@ -213,10 +122,6 @@ public class FileTree implements Iterable<File> {
         public List<File> getChildValues() {
             return new ArrayList<>(childValues);
         }
-
-		public void addChildNode(File value) {
-			childNodes.add(new FileTreeNode(value));
-		}
 
 		public void addChildNode(FileTreeNode node) {
 			childNodes.add(node);
@@ -241,6 +146,9 @@ public class FileTree implements Iterable<File> {
 			return childValues.size();
 		}
 
+		/**
+		 * Метод для рекурсивного заполнения дерева файлов.
+		 * */
 		private void traverseRootAndAddNodes() {
 			if (this.getValue() == null) return;
 			File[] list = this.getValue().listFiles();
@@ -252,11 +160,9 @@ public class FileTree implements Iterable<File> {
 					FileTreeNode node = new FileTreeNode(child);
 					addChildNode(node);
 					node.traverseRootAndAddNodes();
-					//outDirs.offer(child);
 				} else {
 					addChildValue(child);
 				}
-				//childValues.add(child);
 			}
 		}
 
@@ -264,10 +170,6 @@ public class FileTree implements Iterable<File> {
 		public String toString() {
 			return this.value.getName();
 		}
-	}
-
-	private static class IndexWrapper {
-		public int index = 0;
 	}
 
 }
