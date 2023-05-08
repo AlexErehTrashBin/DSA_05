@@ -1,5 +1,7 @@
 package ru.vsu.cs.ereshkin_a_v.task05.render;
 
+import java.awt.*;
+
 class NodeDrawResult {
 	protected final int width;
 	protected final int height;
@@ -7,6 +9,7 @@ class NodeDrawResult {
 	protected final int childrenOverallHeight;
 	protected final Point topLeft;
 	protected final Point bottomRight;
+	protected Color color;
 
 	public NodeDrawResult(Point topLeft, Point bottomRight, int childrenOverallWidth, int childrenOverallHeight) {
 		this.topLeft = topLeft;
@@ -15,6 +18,9 @@ class NodeDrawResult {
 		this.childrenOverallHeight = childrenOverallHeight;
 		width = bottomRight.x - topLeft.x;
 		height = bottomRight.x - topLeft.y;
+	}
+	public void setColor(Color color){
+		this.color = color;
 	}
 
 	public Point getCenterPoint() {
@@ -57,5 +63,9 @@ class NodeDrawResult {
 
 	public int getChildrenOverallHeight() {
 		return childrenOverallHeight;
+	}
+
+	public Color getColor() {
+		return color;
 	}
 }

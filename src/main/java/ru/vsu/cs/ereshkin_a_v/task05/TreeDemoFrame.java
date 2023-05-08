@@ -31,7 +31,7 @@ public class TreeDemoFrame extends JFrame {
 	private final JPanel paintPanel;
 	private final JFileChooser fileChooserSave;
 
-	FileTree tree = new FileTree("C:\\Users\\Alexander\\Downloads");
+	FileTree tree = new FileTree("./rootDirectory");
 
 
 	public TreeDemoFrame() {
