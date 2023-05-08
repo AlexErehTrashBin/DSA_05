@@ -1,8 +1,6 @@
 package ru.vsu.cs.ereshkin_a_v.task05;
 
-import java.awt.*;
 import java.io.File;
-import java.io.FileFilter;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -10,23 +8,13 @@ import java.util.function.Function;
 public class FileTree {
 
 	protected FileTreeNode root = null;
-	protected Function<File, String> toStrFunc;
 
-	public FileTree(Function<File, String> toStrFunc) {
-		this.toStrFunc = toStrFunc;
-	}
-	@SuppressWarnings("unused")
-	public FileTree() {
-		this(Object::toString);
-	}
 	@SuppressWarnings("unused")
 	public FileTree(File rootDirectory) {
-		this(Object::toString);
 		setRoot(rootDirectory);
 	}
 
 	public FileTree(String rootDirectoryPath) {
-		this(Object::toString);
 		setRoot(new File(rootDirectoryPath));
 	}
 
@@ -41,48 +29,6 @@ public class FileTree {
 
 	public void clear() {
 		root = null;
-	}
-
-	public String toBracketNotation() throws Exception {
-		if (toStrFunc == null) {
-			throw new Exception("Не определена функция конвертации в строку");
-		}
-		return toBracketNotation(root);
-	}
-
-	private String toBracketNotation(FileTreeNode parentNode) {
-		StringBuilder str = new StringBuilder();
-		str.append('[');
-		str.append('\"');
-		str.append(toStrFunc.apply(parentNode.value));
-		str.append('\"');
-		str.append(']');
-		boolean existChildrenValues = parentNode.numberOfChildrenValues() != 0;
-		boolean existChildrenNodes = parentNode.numberOfChildrenNodes() != 0;
-		if (!existChildrenValues && !existChildrenNodes) return str.toString();
-		str.append('(');
-		/// Поддиректории
-		for (int i = 0; i < parentNode.numberOfChildrenNodes() - 1; i++) {
-			str.append(toBracketNotation(parentNode.getChildNode(i)));
-			str.append(",");
-		}
-		str.append('\"');
-		str.append(toBracketNotation(parentNode.getChildNode(parentNode.numberOfChildrenNodes() - 1)));
-		str.append('\"');
-		/// Файлы
-		List<File> childValues = parentNode.childValues;
-		if (!childValues.isEmpty() && !parentNode.childNodes.isEmpty()) str.append(", ");
-		for (int i = 0; i < parentNode.numberOfChildrenValues() - 1; i++) {
-			str.append('\"');
-			str.append(childValues.get(i).getName());
-			str.append('\"');
-			str.append(",");
-		}
-		str.append('\"');
-		str.append(childValues.get(parentNode.numberOfChildrenValues() - 1).getName());
-		str.append('\"');
-		str.append(')');
-		return str.toString();
 	}
 
 	public List<File> searchByNameAndExtension(String fileFullName) {

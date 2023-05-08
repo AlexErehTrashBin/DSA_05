@@ -9,13 +9,7 @@ import java.io.File;
 
 public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 	public Component getTreeCellRendererComponent(
-			JTree tree,
-			Object value,
-			boolean sel,
-			boolean expanded,
-			boolean leaf,
-			int row,
-			boolean hasFocus) {
+			JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(
 				tree, value, sel,
 				expanded, leaf, row,

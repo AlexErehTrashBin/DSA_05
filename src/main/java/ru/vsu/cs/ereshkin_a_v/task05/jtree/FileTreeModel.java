@@ -6,6 +6,7 @@ import ru.vsu.cs.ereshkin_a_v.task05.FileTree.FileTreeNode;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.util.ArrayList;
@@ -13,11 +14,16 @@ import java.util.List;
 
 public class FileTreeModel extends DefaultTreeModel {
 	private final List<TreeModelListener> listeners = new ArrayList<>();
-	private final FileTree fileTree;
+	private FileTree fileTree;
 
 	public FileTreeModel(FileTree tree) {
 		super(new DefaultMutableTreeNode(tree.getRoot()));
 		this.fileTree = tree;
+	}
+
+	public void setRootFileTree(File root) {
+		fileTree.setRoot(root);
+		super.setRoot(new DefaultMutableTreeNode(root));
 	}
 
 	@Override

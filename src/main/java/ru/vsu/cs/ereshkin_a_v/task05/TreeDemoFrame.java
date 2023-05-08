@@ -1,5 +1,6 @@
 package ru.vsu.cs.ereshkin_a_v.task05;
 
+import ru.vsu.cs.ereshkin_a_v.task05.jtree.ExplorerFrame;
 import ru.vsu.cs.ereshkin_a_v.task05.jtree.FileTreeCellRenderer;
 import ru.vsu.cs.ereshkin_a_v.task05.jtree.FileTreeModel;
 import ru.vsu.cs.ereshkin_a_v.task05.jtree.JTreeUtils;
@@ -11,15 +12,10 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 
 public class TreeDemoFrame extends JFrame {
 	private JPanel panelMain;
-	private JTextArea textAreaSystemOut;
-	private JTextField textFieldBracketNotationTree;
 	private JButton buttonMakeTree;
 	private JSplitPane splitPaneMain;
 	private JPanel panelPaintArea;
@@ -27,11 +23,12 @@ public class TreeDemoFrame extends JFrame {
 	private JButton buttonToBracketNotation;
 	private JCheckBox checkBoxTransparent;
 	private JTree jTree;
+	private JButton openExplorerButton;
 
 	private final JPanel paintPanel;
 	private final JFileChooser fileChooserSave;
 
-	FileTree tree = new FileTree(".");
+	FileTree tree = new FileTree("./rootDirectory");
 
 
 	public TreeDemoFrame() {
@@ -70,17 +67,6 @@ public class TreeDemoFrame extends JFrame {
 		fileChooserSave.setDialogType(JFileChooser.SAVE_DIALOG);
 		fileChooserSave.setApproveButtonText("Save");
 
-		buttonToBracketNotation.addActionListener(actionEvent -> {
-			if (tree == null) {
-				return;
-			}
-			try {
-				textFieldBracketNotationTree.setText(tree.toBracketNotation());
-			} catch (Exception e) {
-				SwingUtils.showErrorMessageBox(e);
-			}
-		});
-
 		buttonSaveImage.addActionListener(actionEvent -> {
 			if (tree == null) {
 				return;
@@ -97,6 +83,20 @@ public class TreeDemoFrame extends JFrame {
 				SwingUtils.showErrorMessageBox(e);
 			}
 		});
+
+		openExplorerButton.addActionListener(actionEvent -> {
+			EventQueue.invokeLater(() -> {
+				try {
+					//JFrame frameMain = new TreeDemoFrame();
+					JFrame explorerFrame = new ExplorerFrame();
+					explorerFrame.setVisible(true);
+					//explorerFrame.setExtendedState(MAXIMIZED_BOTH);
+				} catch (Exception ex) {
+					SwingUtils.showErrorMessageBox(ex);
+				}
+			});
+		});
+
 		FileTreeModel treeModel = new FileTreeModel(tree);
 		FileTreeCellRenderer cellRenderer = new FileTreeCellRenderer();
 		jTree.setCellRenderer(cellRenderer);
@@ -114,22 +114,6 @@ public class TreeDemoFrame extends JFrame {
 		panelPaintArea.repaint();
 		paintPanel.repaint();
 		panelPaintArea.revalidate();
-	}
-
-	/**
-	 * Выполнение действия с выводом стандартного вывода в окне (textAreaSystemOut)
-	 *
-	 * @param action Выполняемое действие
-	 */
-	private void showSystemOut(Runnable action) {
-		PrintStream oldOut = System.out;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		System.setOut(new PrintStream(baos, true, StandardCharsets.UTF_8));
-
-		action.run();
-
-		textAreaSystemOut.setText(baos.toString(StandardCharsets.UTF_8));
-		System.setOut(oldOut);
 	}
 
 }
