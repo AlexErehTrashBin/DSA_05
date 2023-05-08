@@ -106,7 +106,7 @@ public class JTableUtils {
     }
 
     private static void addRowHeader(JTable table, TableModel tableModel, JScrollPane scrollPane) {
-        final class RowHeaderRenderer extends JLabel implements ListCellRenderer {
+        final class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object> {
             RowHeaderRenderer() {
                 JTableHeader header = table.getTableHeader();
                 setOpaque(true);
@@ -125,19 +125,19 @@ public class JTableUtils {
             }
         }
 
-        ListModel lm = new AbstractListModel() {
+        ListModel<String> lm = new AbstractListModel<>() {
             @Override
             public int getSize() {
                 return tableModel.getRowCount();
             }
 
             @Override
-            public Object getElementAt(int index) {
+            public String getElementAt(int index) {
                 return String.format("[%d]", index);
             }
         };
 
-        JList rowHeader = new JList(lm);
+        JList<String> rowHeader = new JList<>(lm);
         rowHeader.setFixedCellWidth(DEFAULT_ROW_HEADER_WIDTH);
         rowHeader.setFixedCellHeight(
             table.getRowHeight()// + table.getRowMargin()// + table.getIntercellSpacing().height

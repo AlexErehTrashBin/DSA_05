@@ -136,18 +136,6 @@ public class ArrayUtils {
         return ArrayUtils.toPrimitive(arr);
     }
 
-    /*
-    // "Магия" со Stream
-
-    public static int[] strToIntArray(String str) {
-        return Arrays.stream(str.split("(\\s|[,;])+")).mapToInt(Integer::parseInt).toArray();
-    }
-
-    public static double[] strToDoubleArray(String str) {
-        return Arrays.stream(str.split("(\\s|[,;])+")).mapToDouble(Double::parseDouble).toArray();
-    }
-    */
-
     public static String toString(int[] arr, String itemFormat) {
         if (arr == null) {
             return null;
@@ -189,28 +177,6 @@ public class ArrayUtils {
     public static String toString(double[] arr) {
         return toString(arr, null);
     }
-
-    /*
-    // Вариант с ипользованием класса Arrays
-
-    public static String toString(int[] arr) {
-        if (arr == null) {
-            return null;
-        }
-
-        String str = Arrays.toString(arr);
-        return str.substring(1, str.length() - 1);
-    }
-
-    public static String toString(double[] arr) {
-        if (arr == null) {
-            return null;
-        }
-
-        String str = Arrays.toString(arr);
-        return str.substring(1, str.length() - 1);
-    }
-    */
 
     public static int[] readIntArrayFromConsole(String arrName) {
         Scanner scanner = new Scanner(System.in);
@@ -258,39 +224,6 @@ public class ArrayUtils {
         return readDoubleArrayFromConsole(null);
     }
 
-    /*
-    // Вариант с ипользованием дженериков и функциональных интерфейсов (Java 8 и старше)
-
-    public static <T> T readFromConsole(String name, java.util.function.Function<String, T> converter) {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            try {
-                System.out.printf("Введите %s:%n  ", name);
-                String line = scanner.nextLine();
-                return converter.apply(line);
-            }
-            catch(Exception e) {
-                System.out.print("Вы ошиблись, попробуйте еще раз! ");
-            }
-        }
-    }
-
-    private static <T> T readArrayFromConsole(String arrName, java.util.function.Function<String, T> strToArrConverter) {
-        return readFromConsole(
-            "массив" + ((arrName == null || arrName.length() == 0) ? "" : " " + arrName),
-            strToArrConverter
-        );
-    }
-
-    public static int[] readIntArrayFromConsole(String arrName) {
-        return readArrayFromConsole(arrName, ArrayUtils::toIntArray);
-    }
-
-    public static double[] readDoubleArrayFromConsole(String arrName) {
-        return readArrayFromConsole(arrName, ArrayUtils::toDoubleArray);
-    }
-    */
-
 
     /**
      * Конвертация массива строк в двухмерный массив чисел int[][]
@@ -332,7 +265,7 @@ public class ArrayUtils {
     /**
      * Чтение двухмерного массива int[][] с консоли;
      * checkMatrix - задает режим, при котором,
-     * если строки содержат разное кол-во элементот, то
+     * если строки содержат разное кол-во элементов, то
      * это считается ошибкой и предлагается повторить ввод
      */
     public static int[][] readIntArray2FromConsole(String arrName, boolean checkMatrix) {
@@ -362,7 +295,7 @@ public class ArrayUtils {
     /**
      * Чтение двухмерного массива int[][] с консоли;
      * checkMatrix - задает режим, при котором,
-     * если строки содержат разное кол-во элементот, то
+     * если строки содержат разное кол-во элементов, то
      * это считается ошибкой и предлагается повторить ввод
      */
     public static int[][] readIntArray2FromConsole(boolean checkMatrix) {
@@ -372,16 +305,17 @@ public class ArrayUtils {
     /**
      * Чтение двухмерного массива int[][] с консоли;
      * checkMatrix - задает режим, при котором,
-     * если строки содержат разное кол-во элементот, то
+     * если строки содержат разное кол-во элементов, то
      * это считается ошибкой и предлагается повторить ввод
      */
     public static int[][] readIntArray2FromConsole() {
         return readIntArray2FromConsole(false);
     }
 
-    /* Чтение двухмерного массива double[][] с консоли;
+    /**
+     * Чтение двухмерного массива double[][] с консоли;
      * checkMatrix - задает режим, при котором,
-     * если строки содержат разное кол-во элементот, то
+     * если строки содержат разное кол-во элементов, то
      * это считается ошибкой и предлагается повторить ввод
      */
     public static double[][] readDoubleArray2FromConsole(String arrName, boolean checkMatrix) {
@@ -410,7 +344,7 @@ public class ArrayUtils {
 
     /* Чтение двухмерного массива int[][] с консоли;
      * checkMatrix - задает режим, при котором,
-     * если строки содержат разное кол-во элементот, то
+     * если строки содержат разное кол-во элементов, то
      * это считается ошибкой и предлагается повторить ввод
      */
     public static double[][] readDoubleArray2FromConsole(boolean checkMatrix) {
@@ -419,7 +353,7 @@ public class ArrayUtils {
 
     /* Чтение двухмерного массива int[][] с консоли;
      * checkMatrix - задает режим, при котором,
-     * если строки содержат разное кол-во элементот, то
+     * если строки содержат разное кол-во элементов, то
      * это считается ошибкой и предлагается повторить ввод
      */
     public static double[][] readDoubleArray2FromConsole() {
@@ -565,7 +499,7 @@ public class ArrayUtils {
     }
 
     /**
-     * Cоздание одномерного массива целых чисел, заполненного случайными числами
+     * Создание одномерного массива целых чисел, заполненного случайными числами
      * @param length Кол-во элементов в массиве
      * @param minValue Минимальное значение для случайных чисел (включая)
      * @param maxValue Максимальное значение (не включая)
@@ -586,7 +520,7 @@ public class ArrayUtils {
     }
 
     /**
-     * Cоздание двухмерного массива целых чисел, заполненного случайными числами
+     * Создание двухмерного массива целых чисел, заполненного случайными числами
      * @param rowCount Кол-во сток в двумерном массиве
      * @param colCount Кол-во столбцов (элементов в каждой строке)
      * @param minValue Минимальное значение для случайных чисел (включая)
