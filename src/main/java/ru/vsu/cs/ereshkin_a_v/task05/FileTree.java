@@ -1,11 +1,12 @@
 package ru.vsu.cs.ereshkin_a_v.task05;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
-@SuppressWarnings("unused")
 public class FileTree implements Iterable<File> {
 
 	protected FileTreeNode root = null;
@@ -125,9 +126,9 @@ public class FileTree implements Iterable<File> {
 
 	public List<File> searchByNameAndExtension(String fileFullName) {
 		List<File> resultList = new ArrayList<>();
-		for (File file : this) {
+		/*for (File file : this) {
 			if (file.getName().equals(fileFullName)) System.out.println(file.getName());
-		}
+		}*/
 		return resultList;
 	}
 
@@ -174,7 +175,7 @@ public class FileTree implements Iterable<File> {
 		}
 	}
 
-	public class FileTreeNode {
+	public static class FileTreeNode {
 		/**
 		 * Сама директория (поддиректория)
 		 */
@@ -187,6 +188,7 @@ public class FileTree implements Iterable<File> {
 		 * Листья, они же обычные файлы
 		 */
 		private final List<File> childValues;
+		private final Color color = Color.ORANGE;
 
 		public FileTreeNode(File value, List<FileTreeNode> childNodes) {
 			this.value = value;
@@ -264,7 +266,7 @@ public class FileTree implements Iterable<File> {
 		}
 	}
 
-	private class IndexWrapper {
+	private static class IndexWrapper {
 		public int index = 0;
 	}
 

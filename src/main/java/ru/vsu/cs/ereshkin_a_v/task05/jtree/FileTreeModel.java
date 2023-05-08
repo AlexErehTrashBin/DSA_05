@@ -28,8 +28,8 @@ public class FileTreeModel extends DefaultTreeModel {
 	@Override
 	public Object getChild(Object parent, int index) {
 		if (parent == null) return null;
-		System.out.println(parent);
-		if (parent instanceof FileTreeNode fileTreeNode){
+		if (parent instanceof FileTreeNode){
+			FileTreeNode fileTreeNode = (FileTreeNode) parent;
 			int childNodesLength = fileTreeNode.numberOfChildrenNodes();
 			if (index < 0 || index > getChildCount(parent)) return null;
 			if (index > (childNodesLength - 1)){
@@ -45,7 +45,8 @@ public class FileTreeModel extends DefaultTreeModel {
 
 	@Override
 	public int getChildCount(Object parent) {
-		if (parent instanceof FileTreeNode fileTreeNode) {
+		if (parent instanceof FileTreeNode) {
+			FileTreeNode fileTreeNode = (FileTreeNode) parent;
 			int childNodesLength = fileTreeNode.numberOfChildrenNodes();
 			int childValuesLength = fileTreeNode.numberOfChildrenValues();
 			return childNodesLength + childValuesLength;
@@ -65,12 +66,14 @@ public class FileTreeModel extends DefaultTreeModel {
 
 	@Override
 	public int getIndexOfChild(Object parent, Object child) {
-		if (!(parent instanceof FileTreeNode parentNode)) return -1;
+		if (!(parent instanceof FileTreeNode)) return -1;
+		FileTreeNode parentNode = (FileTreeNode) parent;
 		boolean isChildSubDir = child instanceof FileTreeNode;
 		boolean isChildFile = child instanceof File;
 		if (!isChildFile && !isChildSubDir) return -1;
 		int indexOffset = isChildSubDir ? 0 : parentNode.numberOfChildrenNodes();
-		if (child instanceof FileTreeNode node) {
+		if (child instanceof FileTreeNode) {
+			FileTreeNode node = (FileTreeNode) child;
 			for (int i = 0; i < parentNode.numberOfChildrenNodes(); i++) {
 				if (parentNode.getChildNodes().get(i) == node) {
 					return i + indexOffset;

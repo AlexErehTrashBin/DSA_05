@@ -21,8 +21,8 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 				expanded, leaf, row,
 				hasFocus);
 		if (leaf) {
-			if (value instanceof File file) {
-				setText(file.getName());
+			if (value instanceof File) {
+				setText(((File) value).getName());
 			}
 		} else {
 			if (value instanceof FileTree.FileTreeNode) {

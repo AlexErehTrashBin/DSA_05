@@ -3,6 +3,7 @@ package ru.vsu.cs.ereshkin_a_v.task05;
 import ru.vsu.cs.ereshkin_a_v.task05.jtree.FileTreeCellRenderer;
 import ru.vsu.cs.ereshkin_a_v.task05.jtree.FileTreeModel;
 import ru.vsu.cs.ereshkin_a_v.task05.jtree.JTreeUtils;
+import ru.vsu.cs.ereshkin_a_v.task05.render.FileTreePainter;
 import ru.vsu.cs.util.SwingUtils;
 
 import javax.swing.*;
@@ -30,7 +31,7 @@ public class TreeDemoFrame extends JFrame {
 	private final JPanel paintPanel;
 	private final JFileChooser fileChooserSave;
 
-	FileTree tree = new FileTree("./rootDirectory");
+	FileTree tree = new FileTree("C:\\Users\\Alexander\\Downloads");
 
 
 	public TreeDemoFrame() {
@@ -57,9 +58,6 @@ public class TreeDemoFrame extends JFrame {
 			}
 		};
 		JScrollPane paintJScrollPane = new JScrollPane(paintPanel);
-		// TODO Разобраться с отображением скроллбаров и выходом дерева за пределы панели рисования.
-		paintJScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		paintJScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panelPaintArea.add(paintJScrollPane);
 
 		fileChooserSave = new JFileChooser();
@@ -111,9 +109,9 @@ public class TreeDemoFrame extends JFrame {
 	 * Перерисовка дерева
 	 */
 	public void repaintTree() {
-		//panelPaintArea.repaint();
+		panelPaintArea.repaint();
 		paintPanel.repaint();
-		//panelPaintArea.revalidate();
+		panelPaintArea.revalidate();
 	}
 
 	/**

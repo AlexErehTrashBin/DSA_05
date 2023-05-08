@@ -1,6 +1,5 @@
 package ru.vsu.cs.ereshkin_a_v.task05;
 
-import ru.vsu.cs.ereshkin_a_v.task05.jtree.JTreeFrame;
 import ru.vsu.cs.util.SwingUtils;
 
 import javax.swing.*;

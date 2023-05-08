@@ -1,7 +1,8 @@
-package ru.vsu.cs.ereshkin_a_v.task05;
+package ru.vsu.cs.ereshkin_a_v.task05.render;
 
 import org.jfree.svg.SVGGraphics2D;
 import org.jfree.svg.SVGUtils;
+import ru.vsu.cs.ereshkin_a_v.task05.FileTree;
 import ru.vsu.cs.ereshkin_a_v.task05.FileTree.FileTreeNode;
 import ru.vsu.cs.util.DrawUtils;
 
@@ -12,10 +13,10 @@ import java.util.List;
 import java.util.*;
 
 public class FileTreePainter {
-	public static final int TREE_NODE_ONE_CHAR_WIDTH = 10;
+	public static final int TREE_NODE_ONE_CHAR_WIDTH = 20;
 	public static final int TREE_NODE_HEIGHT = 30;
-	public static final int HORIZONTAL_INDENT = 20;
-	public static final int VERTICAL_INDENT = 50;
+	public static final int HORIZONTAL_INDENT = 10;
+	public static final int VERTICAL_INDENT = 25;
 
 	public static final Font FONT = new Font("Microsoft Sans Serif", Font.PLAIN, 20);
 
@@ -33,28 +34,29 @@ public class FileTreePainter {
 			// i-ый дочерний нод
 			FileTreeNode ithChildNode = node.getChildNode(i);
 
-			// Ширина i-й ноды (длина строки * ширина 1 символа).
-			int localTreeNodeWidth = ithChildNode.getValue().toString().length() * TREE_NODE_ONE_CHAR_WIDTH;
-
 			// Следующий X начала ноды
 			int nextPaintX = topLeftX + nextNodeXOffset;
 			// Следующий Y начала ноды
 			int nextPaintY = topLeftY + (TREE_NODE_HEIGHT + VERTICAL_INDENT);
 			NodeDrawResult ithResult = paint(ithChildNode, g2d, nextPaintX, nextPaintY);
 			nodesResultList.add(ithResult);
-			nextNodeXOffset += (nextPaintX + localTreeNodeWidth + HORIZONTAL_INDENT);
+			nextNodeXOffset += (Math.max(ithResult.getChildrenOverallWidth(), ithResult.getWidth()) + HORIZONTAL_INDENT);
 		}
 		/// Создание NodeDrawResult текущего элемента.
 		// Высчитываем ширину прямоугольника (узла), чтобы вся строка умещалась.
 		int treeNodeWidthCalculated = node.getValue().getName().length() * TREE_NODE_ONE_CHAR_WIDTH;
 		//
-		int overallWidthCalculated = treeNodeWidthCalculated;
+		int overallWidthCalculated = treeNodeWidthCalculated + nextNodeXOffset + HORIZONTAL_INDENT;
+		int overallHeightCalculated = TREE_NODE_HEIGHT + VERTICAL_INDENT;
 		if (!nodesResultList.isEmpty()){
-			overallWidthCalculated = topLeftX + nodesResultList.get(nodesResultList.size() - 1).width + HORIZONTAL_INDENT;
+			NodeDrawResult lastNode = nodesResultList.get(nodesResultList.size() - 1);
+			overallHeightCalculated += lastNode.getChildrenOverallHeight();
+			// TODO Прикрутить
+			overallWidthCalculated = nextNodeXOffset /*+ lastNode.getWidth()*/ + HORIZONTAL_INDENT;
 		}
 		Point currentTopLeft = new Point(topLeftX, topLeftY);
 		Point currentBottomRight = new Point(topLeftX + treeNodeWidthCalculated, topLeftY + TREE_NODE_HEIGHT);
-		NodeDrawResult currentResult = new NodeDrawResult(currentTopLeft, currentBottomRight, overallWidthCalculated);
+		NodeDrawResult currentResult = new NodeDrawResult(currentTopLeft, currentBottomRight, overallWidthCalculated, overallHeightCalculated);
 
 		/// Отрисовка
 		// Рисование фона
@@ -93,10 +95,12 @@ public class FileTreePainter {
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		NodeDrawResult rootResult = paint(tree.getRoot(), g2d, HORIZONTAL_INDENT, HORIZONTAL_INDENT);
-		return new Dimension((rootResult == null) ? 0 : rootResult.childrenOverallWidth, /*(rootResult == null) ?*/ 0 /*: rootResult.maxY + HORIZONTAL_INDENT*/);
+
+		return new Dimension((rootResult == null) ? 0 : rootResult.getChildrenOverallWidth(), (rootResult == null) ? 0 : rootResult.getChildrenOverallHeight());
 	}
 
-	public static void saveIntoFile(FileTree tree, String filename, boolean backgroundTransparent) throws IOException {
+	public static void saveIntoFile(FileTree tree, String filename, boolean backgroundTransparent)
+			throws IOException {
 		// первый раз рисуем, только чтобы размеры изображения определить
 		SVGGraphics2D g2 = new SVGGraphics2D(1, 1);
 		Dimension size = FileTreePainter.paint(tree, g2);
@@ -110,63 +114,8 @@ public class FileTreePainter {
 
 		SVGUtils.writeToSVG(new File(filename), g2.getSVGElement());
 	}
-
-	public static void saveIntoFile(FileTree tree, String filename)
-			throws IOException {
+	public static void saveIntoFile(FileTree tree, String filename) throws IOException {
 		saveIntoFile(tree, filename, false);
 	}
 
-	private static class NodeDrawResult {
-		private final int width;
-		private final int height;
-		private final int childrenOverallWidth;
-		private final Point topLeft;
-		private final Point bottomRight;
-
-		public NodeDrawResult(Point topLeft, Point bottomRight, int childrenOverallWidth) {
-			this.topLeft = topLeft;
-			this.bottomRight = bottomRight;
-			this.childrenOverallWidth = childrenOverallWidth;
-			width = bottomRight.x - topLeft.x;
-			height = bottomRight.x - topLeft.y;
-		}
-
-		public Point getCenterPoint(){
-			int x = (topLeft.x + bottomRight.x)/2;
-			int y = (topLeft.y + bottomRight.y)/2;
-			return new Point(x, y);
-		}
-
-		public Point getTopHinge(){
-			int x = (topLeft.x + bottomRight.x)/2;
-			int y = topLeft.y;
-			return new Point(x, y);
-		}
-
-		public Point getBottomHinge(){
-			int x = (topLeft.x + bottomRight.x)/2;
-			int y = bottomRight.y;
-			return new Point(x, y);
-		}
-
-		public int getWidth() {
-			return width;
-		}
-
-		public int getHeight() {
-			return height;
-		}
-
-		public Point getTopLeft() {
-			return new Point(topLeft);
-		}
-
-		public Point getBottomRight() {
-			return new Point(bottomRight);
-		}
-
-		public int getChildrenOverallWidth() {
-			return childrenOverallWidth;
-		}
-	}
 }

@@ -151,7 +151,8 @@ public class SwingUtils {
     public static void setDefaultFont(String fontName, int size) {
         UIManager.getDefaults().forEach((key, value1) -> {
             Object value = UIManager.get(key);
-            if (value instanceof FontUIResource fr) {
+            if (value instanceof FontUIResource) {
+                FontUIResource fr = (FontUIResource) value;
                 fr = new FontUIResource(
                         (fontName != null) ? fontName : fr.getFontName(),
                         fr.getStyle(),

@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 
 /**
- * Набор функций для работы с JTable (ввода и отбражения массивов)
+ * Набор функций для работы с JTable (ввода и отображения массивов)
  * @author Дмитрий Соломатин (кафедра ПиИТ ФКН ВГУ)
  *
  * @see <a href="http://java-online.ru/swing-jtable.xhtml">http://java-online.ru/swing-jtable.xhtml</a>
@@ -86,14 +86,15 @@ public class JTableUtils {
         return columnWidth;
     }
 
-    private static void recalcJTableSize(JTable table) {
+    private static void recalculateJTableSize(JTable table) {
         int width = getColumnWidth(table) * table.getColumnCount();
         int height = 0, rowCount = table.getRowCount();
         for (int r = 0; r < rowCount; r++)
             height += table.getRowHeight(height);
         setFixedSize(table, width, height);
 
-        if (table.getParent() instanceof JViewport && table.getParent().getParent() instanceof JScrollPane scrollPane) {
+        if (table.getParent() instanceof JViewport && table.getParent().getParent() instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) table.getParent();
             if (scrollPane.getRowHeader() != null) {
                 Component rowHeaderView = scrollPane.getRowHeader().getView();
                 if (rowHeaderView instanceof JList) {
@@ -188,9 +189,10 @@ public class JTableUtils {
         };
         table.setModel(tableModel);
         tableColumnWidths.put(table, defaultColWidth);
-        recalcJTableSize(table);
+        recalculateJTableSize(table);
 
-        if (table.getParent() instanceof JViewport && table.getParent().getParent() instanceof JScrollPane scrollPane) {
+        if (table.getParent() instanceof JViewport && table.getParent().getParent() instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) table.getParent();
             if (changeRowsCountButtons || changeColsCountButtons) {
                 List<Component> linkedComponents = new ArrayList<>();
 
@@ -213,7 +215,7 @@ public class JTableUtils {
                     minusButton.setName(table.getName() + "-minusColumnButton");
                     minusButton.addActionListener((ActionEvent evt) -> {
                         tableModel.setColumnCount(tableModel.getColumnCount() > 0 ? tableModel.getColumnCount() - 1 : 0);
-                        recalcJTableSize(table);
+                        recalculateJTableSize(table);
                     });
                     topPanel.add(minusButton);
                     linkedComponents.add(minusButton);
@@ -222,7 +224,7 @@ public class JTableUtils {
                     plusButton.setName(table.getName() + "-plusColumnButton");
                     plusButton.addActionListener((ActionEvent evt) -> {
                         tableModel.addColumn(String.format("[%d]", tableModel.getColumnCount()));
-                        recalcJTableSize(table);
+                        recalculateJTableSize(table);
                     });
                     topPanel.add(plusButton);
                     linkedComponents.add(plusButton);
@@ -237,7 +239,7 @@ public class JTableUtils {
                     minusButton.addActionListener((ActionEvent evt) -> {
                         if (tableModel.getRowCount() > 0) {
                             tableModel.removeRow(tableModel.getRowCount() - 1);
-                            recalcJTableSize(table);
+                            recalculateJTableSize(table);
                         }
                     });
                     leftPanel.add(minusButton);
@@ -247,7 +249,7 @@ public class JTableUtils {
                     plusButton.setName(table.getName() + "-plusRowButton");
                     plusButton.addActionListener((ActionEvent evt) -> {
                         tableModel.setRowCount(tableModel.getRowCount() + 1);
-                        recalcJTableSize(table);
+                        recalculateJTableSize(table);
                     });
                     leftPanel.add(plusButton);
                     linkedComponents.add(plusButton);
@@ -265,7 +267,7 @@ public class JTableUtils {
                 scrollPane.add(panel);
                 scrollPane.getViewport().add(panel);
 
-                // привязываем обработчик событий, который активирует и дективирует зависимые
+                // привязываем обработчик событий, который активирует и деактивирует зависимые
                 // компоненты (кнопки) в зависимости от состояния table
                 table.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if ("enabled".equals(evt.getPropertyName())) {
@@ -295,7 +297,7 @@ public class JTableUtils {
                     }
                 }
                 else if ("rowHeight".equals(evt.getPropertyName())) {
-                    recalcJTableSize(table);
+                    recalculateJTableSize(table);
                 }
             });
 
@@ -319,7 +321,8 @@ public class JTableUtils {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                    if (comp instanceof JLabel label) {
+                    if (comp instanceof JLabel) {
+                        JLabel label = (JLabel) comp;
                         label.setHorizontalAlignment((value == null || value.toString().matches("|-?\\d+")) ? RIGHT : LEFT);
                         label.setBorder(DEFAULT_RENDERER_CELL_BORDER);
                     }
@@ -332,7 +335,8 @@ public class JTableUtils {
                 @Override
                 public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                     Component comp = super.getTableCellEditorComponent(table, value, isSelected, row, column);
-                    if (comp instanceof JTextField textField) {
+                    if (comp instanceof JTextField) {
+                        JTextField textField = (JTextField) comp;
                         textField.setHorizontalAlignment((value == null || value.toString().matches("|-?\\d+")) ? SwingConstants.RIGHT : SwingConstants.LEFT);
                         textField.setBorder(DEFAULT_EDITOR_CELL_BORDER);
                         textField.selectAll();  // чтобы при начале печати перезаписывать текст
@@ -375,19 +379,18 @@ public class JTableUtils {
      * @param columnWidth ширина столбца (меньше или равно 0 - не менять)
      */
     public static void resizeJTable(JTable table, int rowCount, int colCount, int rowHeight, int columnWidth) {
-        if (!(table.getModel() instanceof DefaultTableModel tableModel)) {
-            return;
-        }
+        if (!(table.getModel() instanceof DefaultTableModel)) return;
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 
         tableColumnWidths.put(table, (columnWidth > 0) ? columnWidth : getColumnWidth(table));
         table.setRowHeight((rowHeight > 0) ? rowHeight : table.getRowHeight());
         tableModel.setRowCount((rowCount > 0) ? rowCount : table.getRowCount());
         tableModel.setColumnCount((colCount > 0) ? colCount : table.getColumnCount());
-        recalcJTableSize(table);
+        recalculateJTableSize(table);
     }
 
     /**
-     * Изменение размеров Jtable (ширина столбцов и высота строк не меняется)
+     * Изменение размеров JTable (ширина столбцов и высота строк не меняется)
      * @param table компонент JTable
      * @param rowCount новое кол-во строк
      * @param colCount новое кол-во столбцов
@@ -397,7 +400,7 @@ public class JTableUtils {
     }
 
     /**
-     * Изменение размеров ячеек Jtable
+     * Изменение размеров ячеек JTable
      * @param table компонент JTable
      * @param rowHeight высота строки
      * @param columnWidth ширина столбца
@@ -411,7 +414,8 @@ public class JTableUtils {
      * @param width Ширина
      */
     public static void setRowsHeaderColumnWidth(JTable table, int width) {
-        if (table.getParent() instanceof JViewport && table.getParent().getParent() instanceof JScrollPane scrollPane) {
+        if (table.getParent() instanceof JViewport && table.getParent().getParent() instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) table.getParent();
             if (scrollPane.getRowHeader() != null) {
                 Component rowHeaderView = scrollPane.getRowHeader().getView();
                 if (rowHeaderView instanceof JList) {
@@ -430,10 +434,8 @@ public class JTableUtils {
         if (!array.getClass().isArray()) {
             return;
         }
-        if (!(table.getModel() instanceof DefaultTableModel tableModel)) {
-            return;
-        }
-
+        if (!(table.getModel() instanceof DefaultTableModel)) return;
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         tableColumnWidths.put(table, getColumnWidth(table));
 
         if (itemFormat == null || itemFormat.length() == 0) {
@@ -469,7 +471,7 @@ public class JTableUtils {
                 }
             }
         }
-        recalcJTableSize(table);
+        recalculateJTableSize(table);
     }
 
     /**
