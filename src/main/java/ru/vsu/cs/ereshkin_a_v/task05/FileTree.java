@@ -1,9 +1,9 @@
 package ru.vsu.cs.ereshkin_a_v.task05;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 public class FileTree {
 
@@ -16,6 +16,16 @@ public class FileTree {
 
 	public FileTree(String rootDirectoryPath) {
 		setRoot(new File(rootDirectoryPath));
+	}
+
+	public static void applyLambdaWhileIterating(
+			FileTreeNode node, Consumer<File> consumer) {
+		for (FileTreeNode childNode : node.getChildNodes()) {
+			applyLambdaWhileIterating(childNode, consumer);
+		}
+		for (File value : node.getChildValues()) {
+			consumer.accept(value);
+		}
 	}
 
 	public FileTreeNode getRoot() {
@@ -31,12 +41,19 @@ public class FileTree {
 		root = null;
 	}
 
+	// TODO Регулярные выражения / соло расширения
 	public List<File> searchByNameAndExtension(String fileFullName) {
 		List<File> resultList = new ArrayList<>();
-
+		FileTreeNode root = getRoot();
+		applyLambdaWhileIterating(root, (File file) -> {
+			if (file.getName().equals(fileFullName)) {
+				resultList.add(file);
+			}
+		});
 		return resultList;
 	}
-
+	// TODO - узлы дерева - не только директории,
+	//  но и файлы => список дочерних узлов один, он равен null если у нас файл
 	public static class FileTreeNode {
 		/**
 		 * Сама директория (поддиректория)
@@ -65,9 +82,9 @@ public class FileTree {
 			return new ArrayList<>(childNodes);
 		}
 
-        public List<File> getChildValues() {
-            return new ArrayList<>(childValues);
-        }
+		public List<File> getChildValues() {
+			return new ArrayList<>(childValues);
+		}
 
 		public void addChildNode(FileTreeNode node) {
 			childNodes.add(node);
@@ -80,6 +97,7 @@ public class FileTree {
 		public FileTreeNode getChildNode(int index) {
 			return childNodes.get(index);
 		}
+
 		public File getChildValue(int index) {
 			return childValues.get(index);
 		}
@@ -88,13 +106,13 @@ public class FileTree {
 			return childNodes.size();
 		}
 
-        public int numberOfChildrenValues() {
+		public int numberOfChildrenValues() {
 			return childValues.size();
 		}
 
 		/**
 		 * Метод для рекурсивного заполнения дерева файлов.
-		 * */
+		 */
 		private void traverseRootAndAddNodes() {
 			if (this.getValue() == null) return;
 			File[] list = this.getValue().listFiles();

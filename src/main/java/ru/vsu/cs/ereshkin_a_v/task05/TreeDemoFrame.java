@@ -27,12 +27,13 @@ public class TreeDemoFrame extends JFrame {
 
 	private final JPanel paintPanel;
 	private final JFileChooser fileChooserSave;
-
+	// TODO Избавиться от привязки на директорию в целом при старте,
+	//  давать пользователю её выбрать, а затем уже строить и дерево как рисуночек и JTree
 	FileTree tree = new FileTree("./rootDirectory");
 
 
 	public TreeDemoFrame() {
-		this.setTitle("Двоичные деревья");
+		this.setTitle("Недвоичное дерево");
 		this.setContentPane(panelMain);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();

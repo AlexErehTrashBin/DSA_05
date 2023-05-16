@@ -16,6 +16,11 @@ public class FileListModel extends AbstractListModel<File> {
 		setDirectory(directory);
 	}
 
+	public FileListModel(List<File> files) {
+		this.listElements = new ArrayList<>();
+		listElements.addAll(files);
+	}
+
 	public void setDirectory(FileTreeNode directory){
 		listElements.clear();
 		for (FileTreeNode dir: directory.getChildNodes()){
