@@ -23,10 +23,10 @@ public class FileListModel extends AbstractListModel<File> {
 
 	public void setDirectory(FileTreeNode directory){
 		listElements.clear();
-		for (FileTreeNode dir: directory.getChildNodes()){
+		for (FileTreeNode dir: directory.getChildren()){
 			listElements.add(dir.getValue());
 		}
-		listElements.addAll(directory.getChildValues());
+		listElements.addAll(directory.getChildFiles());
 	}
 
 	@Override

@@ -8,12 +8,12 @@ import java.io.File;
 
 public class JTreeUtils {
 	private static void fillJTreeRoot(DefaultMutableTreeNode root, FileTreeNode rootNode){
-		for (FileTreeNode subdir : rootNode.getChildNodes()){
+		for (FileTreeNode subdir : rootNode.getChildren()){
 			DefaultMutableTreeNode subdirTreeNode = new DefaultMutableTreeNode(subdir);
 			root.add(subdirTreeNode);
 			fillJTreeRoot(subdirTreeNode, subdir);
 		}
-		for (File file : rootNode.getChildValues()){
+		for (File file : rootNode.getChildFiles()){
 			DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(file);
 			root.add(fileNode);
 		}

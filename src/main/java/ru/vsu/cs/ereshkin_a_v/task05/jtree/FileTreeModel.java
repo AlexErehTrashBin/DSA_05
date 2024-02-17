@@ -13,7 +13,7 @@ import java.util.List;
 
 public class FileTreeModel extends DefaultTreeModel {
 	private final List<TreeModelListener> listeners = new ArrayList<>();
-	private FileTree fileTree;
+	private final FileTree fileTree;
 
 	public FileTreeModel(FileTree tree) {
 		super(new DefaultMutableTreeNode(tree.getRoot()));
@@ -35,15 +35,7 @@ public class FileTreeModel extends DefaultTreeModel {
 		if (parent == null) return null;
 		if (parent instanceof FileTreeNode){
 			FileTreeNode fileTreeNode = (FileTreeNode) parent;
-			int childNodesLength = fileTreeNode.numberOfChildrenNodes();
-			if (index < 0 || index > getChildCount(parent)) return null;
-			if (index > (childNodesLength - 1)){
-				// Перебор по файлам
-				return fileTreeNode.getChildValue(index - childNodesLength);
-			} else {
-				// Перебор по поддиректориям
-				return fileTreeNode.getChildNode(index);
-			}
+			return fileTreeNode.getChild(index);
 		}
 		return null;
 	}
@@ -52,16 +44,15 @@ public class FileTreeModel extends DefaultTreeModel {
 	public int getChildCount(Object parent) {
 		if (parent instanceof FileTreeNode) {
 			FileTreeNode fileTreeNode = (FileTreeNode) parent;
-			int childNodesLength = fileTreeNode.numberOfChildrenNodes();
-			int childValuesLength = fileTreeNode.numberOfChildrenValues();
-			return childNodesLength + childValuesLength;
+			return fileTreeNode.numberOfChildren();
 		}
 		return 0;
 	}
 
 	@Override
 	public boolean isLeaf(Object node) {
-		return node instanceof File;
+		FileTreeNode treeNode = (FileTreeNode) node;
+		return !treeNode.isDirectory();
 	}
 
 	@Override
@@ -72,28 +63,10 @@ public class FileTreeModel extends DefaultTreeModel {
 	@Override
 	public int getIndexOfChild(Object parent, Object child) {
 		if (!(parent instanceof FileTreeNode)) return -1;
+		if (!(child instanceof FileTreeNode)) return -1;
 		FileTreeNode parentNode = (FileTreeNode) parent;
-		boolean isChildSubDir = child instanceof FileTreeNode;
-		boolean isChildFile = child instanceof File;
-		if (!isChildFile && !isChildSubDir) return -1;
-		int indexOffset = isChildSubDir ? 0 : parentNode.numberOfChildrenNodes();
-		if (child instanceof FileTreeNode) {
-			FileTreeNode node = (FileTreeNode) child;
-			for (int i = 0; i < parentNode.numberOfChildrenNodes(); i++) {
-				if (parentNode.getChildNodes().get(i) == node) {
-					return i + indexOffset;
-				}
-			}
-		}
-		else {
-			File file = (File) child;
-			for (int i = 0; i < parentNode.numberOfChildrenValues(); i++) {
-				if (parentNode.getChildValues().get(i) == file) {
-					return i + indexOffset;
-				}
-			}
-		}
-
+		FileTreeNode childNode = (FileTreeNode) child;
+		parentNode.getChildren().indexOf(childNode);
 		return 0;
 	}
 

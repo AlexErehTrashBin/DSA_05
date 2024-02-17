@@ -36,30 +36,15 @@ public class FileTreePainter {
 		// Максимальная
 		int maxHeight = 0;
 		/// Перебор и рекурсивный вызов отрисовки
-		for (int i = 0; i < node.numberOfChildrenNodes(); i++) {
+		for (int i = 0; i < node.numberOfChildren(); i++) {
 			// i-ый дочерний нод
-			FileTreeNode ithChildNode = node.getChildNode(i);
+			FileTreeNode ithChildNode = node.getChild(i);
 
 			// Следующий X начала ноды
 			int nextPaintX = topLeftX + nextNodeXOffset;
 			// Следующий Y начала ноды
 			int nextPaintY = topLeftY + (TREE_NODE_HEIGHT + VERTICAL_INDENT);
 			NodeDrawResult ithResult = paint(ithChildNode, g2d, nextPaintX, nextPaintY);
-			if (ithResult.childrenOverallHeight > maxHeight) {
-				maxHeight = ithResult.childrenOverallHeight;
-			}
-			nodesResultList.add(ithResult);
-			nextNodeXOffset += (Math.max(ithResult.getChildrenOverallWidth(), ithResult.getWidth()) + HORIZONTAL_INDENT);
-		}
-		for (int i = 0; i < node.numberOfChildrenValues(); i++) {
-			// i-ый дочерний нод
-			File ithChildNode = node.getChildValue(i);
-
-			// Следующий X начала ноды
-			int nextPaintX = topLeftX + nextNodeXOffset;
-			// Следующий Y начала ноды
-			int nextPaintY = topLeftY + (TREE_NODE_HEIGHT + VERTICAL_INDENT);
-			NodeDrawResult ithResult = paintFile(ithChildNode, g2d, nextPaintX, nextPaintY);
 			if (ithResult.childrenOverallHeight > maxHeight) {
 				maxHeight = ithResult.childrenOverallHeight;
 			}
@@ -83,9 +68,12 @@ public class FileTreePainter {
 		Point currentTopLeft = new Point(currentTopLeftX, topLeftY);
 		Point currentBottomRight = new Point(currentBottomRightX, topLeftY + TREE_NODE_HEIGHT);
 		NodeDrawResult currentResult = new NodeDrawResult(currentTopLeft, currentBottomRight, overallWidthCalculated, overallHeightCalculated);
+
+		Color bgColor = DIRECTORY_BG_COLOR;
+		if (!node.isDirectory()) bgColor = FILE_BG_COLOR;
 		/// Отрисовка
 		// Рисование фона
-		drawFilledRectNode(g2d, currentTopLeft, treeNodeWidthCalculated, DIRECTORY_BG_COLOR);
+		drawFilledRectNode(g2d, currentTopLeft, treeNodeWidthCalculated, bgColor);
 		// Рисование контуров
 		drawOutlineForRectNode(g2d, currentTopLeft, treeNodeWidthCalculated);
 		// Рисование рёбер
@@ -93,23 +81,10 @@ public class FileTreePainter {
 			drawEdge(g2d, nodeDrawResult.getTopHinge(), currentResult.getBottomHinge());
 		}
 		// Рисование текста внутри ноды
-		drawTextInNode(g2d, currentTopLeft, node.getValue().getName(), treeNodeWidthCalculated, DIRECTORY_BG_COLOR);
+		drawTextInNode(g2d, currentTopLeft, node.getValue().getName(), treeNodeWidthCalculated, bgColor);
 		return currentResult;
 	}
-	private static NodeDrawResult paintFile(File file, Graphics2D g2d, int topLeftX, int topLeftY){
-		int treeNodeWidthCalculated = file.getName().length() * TREE_NODE_ONE_CHAR_WIDTH;
-		Point currentTopLeft = new Point(topLeftX, topLeftY);
-		Point currentBottomRight = new Point(topLeftX + treeNodeWidthCalculated, topLeftY + TREE_NODE_HEIGHT);
-		NodeDrawResult currentResult = new NodeDrawResult(currentTopLeft, currentBottomRight, treeNodeWidthCalculated, TREE_NODE_HEIGHT);
-		/// Отрисовка
-		// Рисование фона
-		drawFilledRectNode(g2d, currentTopLeft, treeNodeWidthCalculated, FILE_BG_COLOR);
-		// Рисование контуров
-		drawOutlineForRectNode(g2d, currentTopLeft, treeNodeWidthCalculated);
-		// Рисование текста внутри ноды
-		drawTextInNode(g2d, currentTopLeft, file.getName(), treeNodeWidthCalculated, FILE_BG_COLOR);
-		return currentResult;
-	}
+
 	private static void drawEdge(Graphics2D g2d, Point topHinge, Point bottomHinge){
 		Color prevColor = g2d.getColor();
 		g2d.setColor(FileTreePainter.EDGE_COLOR);

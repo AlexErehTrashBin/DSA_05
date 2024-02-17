@@ -16,20 +16,18 @@ import java.io.File;
 
 public class TreeDemoFrame extends JFrame {
 	private JPanel panelMain;
-	private JButton buttonMakeTree;
 	private JSplitPane splitPaneMain;
 	private JPanel panelPaintArea;
 	private JButton buttonSaveImage;
-	private JButton buttonToBracketNotation;
 	private JCheckBox checkBoxTransparent;
 	private JTree jTree;
 	private JButton openExplorerButton;
+	private JButton setPathButton;
 
 	private final JPanel paintPanel;
 	private final JFileChooser fileChooserSave;
-	// TODO Избавиться от привязки на директорию в целом при старте,
-	//  давать пользователю её выбрать, а затем уже строить и дерево как рисуночек и JTree
-	FileTree tree = new FileTree("./rootDirectory");
+	private final JFileChooser dirPathChooser;
+	FileTree tree;
 
 
 	public TreeDemoFrame() {
@@ -49,6 +47,7 @@ public class TreeDemoFrame extends JFrame {
 			@Override
 			public void paintComponent(Graphics gr) {
 				super.paintComponent(gr);
+				if (tree == null) return;
 				Dimension paintSize = FileTreePainter.paint(tree, gr);
 				if (!paintSize.equals(this.getPreferredSize())) {
 					SwingUtils.setFixedSize(this, paintSize.width, paintSize.height);
@@ -68,6 +67,24 @@ public class TreeDemoFrame extends JFrame {
 		fileChooserSave.setDialogType(JFileChooser.SAVE_DIALOG);
 		fileChooserSave.setApproveButtonText("Save");
 
+		dirPathChooser = new JFileChooser();
+		dirPathChooser.setCurrentDirectory(new File("."));
+		dirPathChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		dirPathChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+		dirPathChooser.setApproveButtonText("Choose");
+
+		setPathButton.addActionListener(event -> {
+			try {
+				if (dirPathChooser.showOpenDialog(TreeDemoFrame.this) == JFileChooser.APPROVE_OPTION) {
+					String dirName = dirPathChooser.getSelectedFile().getPath();
+					initTree(dirName);
+					//initJTree();
+				}
+			} catch (Exception e) {
+				SwingUtils.showErrorMessageBox(e);
+			}
+		});
+
 		buttonSaveImage.addActionListener(actionEvent -> {
 			if (tree == null) {
 				return;
@@ -85,26 +102,27 @@ public class TreeDemoFrame extends JFrame {
 			}
 		});
 
-		openExplorerButton.addActionListener(actionEvent -> {
-			EventQueue.invokeLater(() -> {
-				try {
-					//JFrame frameMain = new TreeDemoFrame();
-					JFrame explorerFrame = new ExplorerFrame();
-					explorerFrame.setVisible(true);
-					//explorerFrame.setExtendedState(MAXIMIZED_BOTH);
-				} catch (Exception ex) {
-					SwingUtils.showErrorMessageBox(ex);
-				}
-			});
-		});
+		openExplorerButton.addActionListener(actionEvent -> EventQueue.invokeLater(() -> {
+			try {
+				JFrame explorerFrame = new ExplorerFrame(tree);
+				explorerFrame.setVisible(true);
+			} catch (Exception ex) {
+				SwingUtils.showErrorMessageBox(ex);
+			}
+		}));
 
+		initTree(".");
+	}
+
+	private void initTree(String dirPath){
+		tree = new FileTree(dirPath);
 		FileTreeModel treeModel = new FileTreeModel(tree);
 		FileTreeCellRenderer cellRenderer = new FileTreeCellRenderer();
 		jTree.setCellRenderer(cellRenderer);
 		jTree.setModel(treeModel);
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode(tree.getRoot());
 		JTreeUtils.fillJTreeRoot(root, tree);
-		jTree = new JTree(root);
+		jTree.repaint();
 		repaintTree();
 	}
 

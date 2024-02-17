@@ -1,7 +1,5 @@
 package ru.vsu.cs.ereshkin_a_v.task05.jtree;
 
-import ru.vsu.cs.ereshkin_a_v.task05.FileTree;
-
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
@@ -17,10 +15,6 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 		if (leaf) {
 			if (value instanceof File) {
 				setText(((File) value).getName());
-			}
-		} else {
-			if (value instanceof FileTree.FileTreeNode) {
-				// TODO МБ здесь что-то будет для исправления разворачивания пустой папки.
 			}
 		}
 		return this;

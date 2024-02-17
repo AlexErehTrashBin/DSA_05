@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 public class FileTree {
 
@@ -20,10 +23,12 @@ public class FileTree {
 
 	public static void applyLambdaWhileIterating(
 			FileTreeNode node, Consumer<File> consumer) {
-		for (FileTreeNode childNode : node.getChildNodes()) {
+		for (FileTreeNode childNode : node.getChildren()) {
 			applyLambdaWhileIterating(childNode, consumer);
 		}
-		for (File value : node.getChildValues()) {
+		for (File value : node.children.stream()
+				.map(it -> it.value)
+				.collect(Collectors.toList())) {
 			consumer.accept(value);
 		}
 	}
@@ -41,74 +46,93 @@ public class FileTree {
 		root = null;
 	}
 
-	// TODO Регулярные выражения / соло расширения
-	public List<File> searchByNameAndExtension(String fileFullName) {
+	public List<File> searchByNameAndExtension(String predicate) {
+		Pattern pattern;
+		try {
+			predicate = predicate.replaceAll("[.]", "[.]");
+			predicate = predicate.replaceAll("[*]", ".*");
+			pattern = Pattern.compile(predicate);
+		} catch (PatternSyntaxException ex){
+			return new ArrayList<>();
+		}
 		List<File> resultList = new ArrayList<>();
 		FileTreeNode root = getRoot();
+		Pattern finalPattern = pattern;
+		final String predicateFinal = predicate;
 		applyLambdaWhileIterating(root, (File file) -> {
-			if (file.getName().equals(fileFullName)) {
+			String fileName = file.getName();
+			if (finalPattern.matcher(fileName).matches()) {
+				resultList.add(file);
+				return;
+			}
+			if (fileName.equals(predicateFinal)){
+				resultList.add(file);
+				return;
+			}
+			if (fileName.endsWith(predicateFinal)){
 				resultList.add(file);
 			}
+
 		});
 		return resultList;
 	}
-	// TODO - узлы дерева - не только директории,
-	//  но и файлы => список дочерних узлов один, он равен null если у нас файл
+
 	public static class FileTreeNode {
 		/**
 		 * Сама директория (поддиректория)
 		 */
 		private final File value;
-		/**
-		 * Дочерние узлы, они же поддиректории
-		 */
-		private final List<FileTreeNode> childNodes;
-		/**
-		 * Листья, они же обычные файлы
-		 */
-		private final List<File> childValues;
+
+		private final List<FileTreeNode> children;
 
 		public FileTreeNode(File value) {
 			this.value = value;
-			this.childNodes = new ArrayList<>();
-			this.childValues = new ArrayList<>();
+			this.children = new ArrayList<>();
 		}
 
 		public File getValue() {
 			return value;
 		}
 
-		public List<FileTreeNode> getChildNodes() {
-			return new ArrayList<>(childNodes);
+		public List<FileTreeNode> getChildren() {
+			return new ArrayList<>(children);
 		}
 
-		public List<File> getChildValues() {
-			return new ArrayList<>(childValues);
+		public List<File> getChildrenAsFiles() {
+			return new ArrayList<>(children).stream()
+					.map((it) -> it.value)
+					.collect(Collectors.toList());
 		}
 
-		public void addChildNode(FileTreeNode node) {
-			childNodes.add(node);
+		public List<File> getChildFiles() {
+			return children.stream()
+					.map(it -> it.value)
+					.filter((it) -> !it.isDirectory())
+					.collect(Collectors.toList());
 		}
 
-		public void addChildValue(File value) {
-			childValues.add(value);
+		public List<File> getChildDirectories() {
+			return children.stream()
+					.map(it -> it.value)
+					.filter(File::isDirectory)
+					.collect(Collectors.toList());
 		}
 
-		public FileTreeNode getChildNode(int index) {
-			return childNodes.get(index);
+
+		public void addChild(FileTreeNode node) {
+			children.add(node);
 		}
 
-		public File getChildValue(int index) {
-			return childValues.get(index);
+
+		public FileTreeNode getChild(int index) {
+			return children.get(index);
 		}
 
-		public int numberOfChildrenNodes() {
-			return childNodes.size();
+
+		public int numberOfChildren() {
+			return children.size();
 		}
 
-		public int numberOfChildrenValues() {
-			return childValues.size();
-		}
 
 		/**
 		 * Метод для рекурсивного заполнения дерева файлов.
@@ -122,10 +146,10 @@ public class FileTree {
 				boolean isDir = child.isDirectory();
 				if (isDir) {
 					FileTreeNode node = new FileTreeNode(child);
-					addChildNode(node);
+					addChild(node);
 					node.traverseRootAndAddNodes();
 				} else {
-					addChildValue(child);
+					addChild(new FileTreeNode(child));
 				}
 			}
 		}
@@ -133,6 +157,10 @@ public class FileTree {
 		@Override
 		public String toString() {
 			return this.value.getName();
+		}
+
+		public boolean isDirectory() {
+			return value.isDirectory();
 		}
 	}
 

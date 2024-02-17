@@ -1,14 +1,11 @@
 package ru.vsu.cs.ereshkin_a_v.task05.jtree;
 
 import ru.vsu.cs.ereshkin_a_v.task05.FileTree;
-import ru.vsu.cs.ereshkin_a_v.task05.FileTree.FileTreeNode;
 import ru.vsu.cs.util.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
@@ -20,9 +17,8 @@ public class ExplorerFrame extends JFrame {
 	private JScrollPane jListScrollPane;
 	private JTextField textField1;
 	private JButton searchButton;
-	FileTree tree = new FileTree(".");
 
-	public ExplorerFrame() {
+	public ExplorerFrame(FileTree tree) {
 		this.setTitle("JTree штука");
 		this.setContentPane(panelMain);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -39,7 +35,7 @@ public class ExplorerFrame extends JFrame {
 		FileListCellRenderer listRenderer = new FileListCellRenderer();
 		jList.setModel(listModel);
 		jList.setCellRenderer(listRenderer);
-		jList.addListSelectionListener(e -> {
+		/*jList.addListSelectionListener(e -> {
 			int selectedIndex = e.getFirstIndex();
 			File elementAtIndex = listModel.getElementAt(selectedIndex);
 			boolean isFolder = elementAtIndex.isDirectory();
@@ -52,7 +48,7 @@ public class ExplorerFrame extends JFrame {
 			treeModel.reload();
 			//jTree.setModel(treeModel);
 			jTree.repaint();
-		});
+		});*/
 		searchButton.addActionListener(e -> {
 			String name = textField1.getText();
 			List<File> searchList = tree.searchByNameAndExtension(name);
